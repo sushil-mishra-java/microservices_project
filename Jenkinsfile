@@ -21,8 +21,6 @@ pipeline {
           pwd
           ls
 
-          cd order-service   # <-- adjust if different
-
           mvn clean package -DskipTests
 
           aws ecr get-login-password --region $AWS_REGION \

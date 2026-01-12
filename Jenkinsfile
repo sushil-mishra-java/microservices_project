@@ -15,18 +15,25 @@ pipeline {
       }
     }
 
-    stage('Build Order Service') {
+    stage('Build & Push Order Service') {
       steps {
         sh '''
-          cd OrderService
+          pwd
+          ls
+
+          cd order-service   # <-- adjust if different
+
           mvn clean package -DskipTests
+
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin $ECR
+
           docker build -t order-service:${BUILD_NUMBER} .
-          docker tag order-service:${BUILD_NUMBER} ${ECR}/order-service:${BUILD_NUMBER}
-          docker push ${ECR}/order-service:${BUILD_NUMBER}
+          docker tag order-service:${BUILD_NUMBER} $ECR/order-service:${BUILD_NUMBER}
+          docker push $ECR/order-service:${BUILD_NUMBER}
         '''
       }
     }
-
   }
 
   post {
